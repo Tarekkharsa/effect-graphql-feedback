@@ -84,6 +84,8 @@ input PublicationFilter {
 type Query {
   node(id: ID!): Node
   book(isbn: Isbn!): Book
+  "One entry per isbn, in order; null when not found."
+  books(isbns: [Isbn!]!): [Book]!
   publications(first: Int!, after: String, sort: SortOrder, filter: PublicationFilter): PublicationConnection!
   search(text: String!): [SearchResult!]!
   shelves: [Shelf!]!

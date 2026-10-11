@@ -60,4 +60,4 @@ export const failureOf = (exit: { _tag: string; cause?: unknown }) => {
   }
 }
 
-export const verdict = (fixed: boolean) => console.log(`verdict:  ${fixed ? "FIXED" : "OPEN"}`)
+export const verdict = (fixed: boolean, label = "FIXED") => console.log(`verdict:  ${fixed ? label : "OPEN"}`)

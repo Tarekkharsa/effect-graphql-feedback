@@ -17,12 +17,13 @@
     "probe:03": "tsx probes/03-url-params.ts",
     "probe:04": "tsx probes/04-batching-middleware.ts",
     "probe:05": "tsx probes/05-test-layer.ts",
-    "probes": "npm run probe:00 && npm run probe:01 && npm run probe:02 && npm run probe:03 && npm run probe:04 && npm run probe:05"
+    "probe:06": "tsx probes/06-resolver.ts",
+    "probes": "npm run probe:00 && npm run probe:01 && npm run probe:02 && npm run probe:03 && npm run probe:04 && npm run probe:05 && npm run probe:06"
   },
   "dependencies": {
-    "@effect/graphql-generator": "https://pkg.pr.new/Effect-TS/effect/@effect/graphql-generator@7ee8dca",
-    "@effect/platform-node": "https://pkg.pr.new/Effect-TS/effect/@effect/platform-node@7ee8dca",
-    "effect": "https://pkg.pr.new/Effect-TS/effect/effect@7ee8dca"
+    "@effect/graphql-generator": "https://pkg.pr.new/Effect-TS/effect/@effect/graphql-generator@d24d55e",
+    "@effect/platform-node": "https://pkg.pr.new/Effect-TS/effect/@effect/platform-node@d24d55e",
+    "effect": "https://pkg.pr.new/Effect-TS/effect/effect@d24d55e"
   },
   "devDependencies": {
     "tsx": "^4.23.15",

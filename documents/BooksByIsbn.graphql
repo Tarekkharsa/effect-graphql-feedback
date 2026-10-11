@@ -1,0 +1,7 @@
+query BooksByIsbn($isbns: [Isbn!]!) {
+  books(isbns: $isbns) {
+    id
+    title
+    isbn
+  }
+}
