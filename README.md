@@ -10,9 +10,9 @@ This repo reproduces the same behavior with an invented "library" schema, so it 
 
 | Package | Version |
 | --- | --- |
-| `effect` | pkg.pr.new preview `091d1a1` |
-| `@effect/graphql-generator` | pkg.pr.new preview `091d1a1` |
-| `@effect/platform-node` | pkg.pr.new preview `091d1a1` |
+| `effect` | pkg.pr.new preview `7ee8dca` |
+| `@effect/graphql-generator` | pkg.pr.new preview `7ee8dca` |
+| `@effect/platform-node` | pkg.pr.new preview `7ee8dca` |
 | `typescript-7` | `typescript@7.0.2` (native `tsc`) |
 | `typescript` | `@typescript/typescript6@6.0.2` (classic JS API; its `tsc6` reports 6.0.3) |
 | Node | 24.14.1 (needs >= 22.18 for type stripping) |
@@ -48,14 +48,16 @@ Each probe uses a mock `HttpClient` under `GraphQLProtocol.layerHttp` (probe 05 
 
 ## Gaps
 
-| Gap | Probe | Observed | Wanted |
+Re-run against `7ee8dca` (first run was `091d1a1`).
+
+| Gap | Probe | Status | Observed on `7ee8dca` |
 | --- | --- | --- | --- |
-| TS 7 support | `probe:00` (`typecheck:ts7`) | Generated code and a call site type-check on TS 7.0.2 with no TS2589. | Works as is. Listed as the reason to adopt. |
-| HTTP status on errors | `probes/01-response-error-status.ts` | A 401 with a GraphQL errors body and a 200 with the same body both give `ResponseError` with no status. | The HTTP status (and headers) on the error. |
-| GET transport | `probes/02-get-transport.ts` | Queries are always sent as `POST`. | An opt-in GET transport for queries, so HTTP and CDN caches can serve them. |
-| Per-call URL params | `probes/03-url-params.ts` | Per-call options take headers only. A carrier header plus `HttpClient.mapRequest` works around it. | A per-call or middleware way to set URL params. |
-| Middleware for runtime documents | `probes/04-batching-middleware.ts` | `GraphQLProtocol.execute` skips group middleware. `GraphQL.query(..., { result: Schema.Json })` in a group keeps it. | A documented path for runtime-built documents (for example batched aliases) through the client. |
-| Test layer | `probes/05-test-layer.ts` | A hand-written `GraphQLProtocol` layer serves fixtures by `operationName`; fixtures go through the real decode, and one without `__typename` fails. | A shipped fixture or test layer. |
+| TS 7 support | `probe:00` (`typecheck:ts7`) | Works | Generated code and call sites type-check on TS 7.0.2 and TS 6 with no TS2589. |
+| HTTP status on errors | `probes/01-response-error-status.ts` | Fixed in 7ee8dca | `ResponseError.status` is 401 for a 401 with an errors body and 200 for a 200 with the same body. Before: no status. |
+| GET transport | `probes/02-get-transport.ts` | Fixed in 7ee8dca | With `layerHttp({ queryMethod: "GET" })` a query is sent as `GET` with `query`, `variables`, `operationName` as URL params. Default is still `POST`. |
+| Per-call URL params | `probes/03-url-params.ts` | Fixed in 7ee8dca | `client.Search(vars, { urlParams: { preview } })` and `GraphQLRequest.urlParams` in middleware both reach the URL. No carrier header or `HttpClient.mapRequest`. |
+| Middleware for runtime documents | `probes/04-batching-middleware.ts` | Fixed in 7ee8dca | The README Batching pattern (`GraphQL.query(name, { document, result: Schema.Json })` in its own group with `.middleware(Tag)`) runs middleware. Raw `GraphQLProtocol.execute` still skips it. |
+| Test layer | `probes/05-test-layer.ts` | Open | Still no shipped helper. A hand-written `GraphQLProtocol` layer works; `execute` now returns `{ body, status }`, so such layers had to change. |
 
 ## License
 

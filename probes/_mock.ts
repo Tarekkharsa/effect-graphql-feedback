@@ -40,8 +40,9 @@ export const mockHttp = (
 
 export const protocol = (
   handler: (req: HttpClientRequest.HttpClientRequest) => Response,
-  map?: (client: HttpClient.HttpClient) => HttpClient.HttpClient
-) => GraphQLProtocol.layerHttp({ url: ENDPOINT }).pipe(Layer.provide(mockHttp(handler, map)))
+  map?: (client: HttpClient.HttpClient) => HttpClient.HttpClient,
+  options: { readonly queryMethod?: "GET" | "POST" } = {}
+) => GraphQLProtocol.layerHttp({ url: ENDPOINT, ...options }).pipe(Layer.provide(mockHttp(handler, map)))
 
 export const show = (label: string, value: unknown) =>
   console.log(`${label.padEnd(10)} ${JSON.stringify(value, (_, x) => (typeof x === "bigint" ? String(x) : x))}`)
@@ -58,3 +59,5 @@ export const failureOf = (exit: { _tag: string; cause?: unknown }) => {
     message: String(error.reason?.message ?? error.message ?? "").slice(0, 160)
   }
 }
+
+export const verdict = (fixed: boolean) => console.log(`verdict:  ${fixed ? "FIXED" : "OPEN"}`)

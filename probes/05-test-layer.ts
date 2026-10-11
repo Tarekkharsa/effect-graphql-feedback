@@ -3,11 +3,11 @@ import * as Layer from "effect/Layer"
 import * as Stream from "effect/Stream"
 import { GraphQLClient, GraphQLProtocol } from "effect/graphql"
 import { SearchGraphQLGroup } from "../documents/Search.graphql.ts"
-import { failureOf, show } from "./_mock.ts"
+import { failureOf, show, verdict } from "./_mock.ts"
 
 const fixtureLayer = (fixtures: Record<string, unknown>) =>
   Layer.succeed(GraphQLProtocol.GraphQLProtocol, {
-    execute: (request) => Effect.succeed({ data: fixtures[request.operationName ?? ""] }),
+    execute: (request) => Effect.succeed({ body: { data: fixtures[request.operationName ?? ""] } }),
     subscribe: () => Stream.empty
   })
 
@@ -24,3 +24,5 @@ const invalid = await run({ search: [{ id: "b1", title: "Dune", isbn: "978044101
 show("invalid", invalid._tag === "Success" ? invalid.value : failureOf(invalid))
 console.log("\nobserved: a hand-written GraphQLProtocol layer works and fixtures still go through the real decode; a fixture without __typename fails.")
 console.log("wanted:   a shipped test helper (e.g. GraphQLProtocol.layerTest / layerFixtures keyed by operation) so every project does not hand-roll this.")
+console.log("now:      (7ee8dca) still no shipped helper; execute now returns { body, status }, so hand-written layers had to change.")
+verdict(false)

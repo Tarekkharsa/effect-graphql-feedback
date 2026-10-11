@@ -1,30 +1,38 @@
 import * as Effect from "effect/Effect"
-import { GraphQLClient } from "effect/graphql"
-import * as HttpClient from "effect/http/HttpClient"
-import * as HttpClientRequest from "effect/http/HttpClientRequest"
+import * as Layer from "effect/Layer"
+import * as UrlParams from "effect/http/UrlParams"
+import { GraphQLClient, GraphQLMiddleware } from "effect/graphql"
 import { SearchGraphQLGroup } from "../documents/Search.graphql.ts"
-import { json, protocol, show, wire } from "./_mock.ts"
+import { json, protocol, show, verdict, wire } from "./_mock.ts"
 
-const CARRIER = "x-url-param-preview"
+class Preview extends GraphQLMiddleware.Service<Preview>()("feedback/Preview") {}
+const previewLayer = Layer.succeed(
+  Preview,
+  GraphQLMiddleware.mapRequest((request) =>
+    Effect.succeed({ ...request, urlParams: UrlParams.set(request.urlParams, "preview", "mw-7") })
+  )
+)
 
-const headerToUrlParam = (client: HttpClient.HttpClient) =>
-  HttpClient.mapRequest(client, (req) => {
-    const value = req.headers[CARRIER]
-    return value === undefined
-      ? req
-      : req.pipe(HttpClientRequest.removeHeader(CARRIER), HttpClientRequest.setUrlParam("preview", value))
-  })
-
-const run = (map?: (client: HttpClient.HttpClient) => HttpClient.HttpClient) =>
-  Effect.gen(function*() {
-    const client = yield* GraphQLClient.make(SearchGraphQLGroup)
-    return yield* client.Search({ text: "x" }, { headers: { [CARRIER]: "draft-42" } })
-  }).pipe(Effect.provide(protocol(() => json({ data: { search: [] } }), map)), Effect.runPromise)
+const handler = () => json({ data: { search: [] } })
 
 console.log("03 url-params: a per-call URL query parameter (e.g. ?preview=<token>)\n")
-await run()
-show("plain", { url: wire[0]?.url, urlParams: wire[0]?.urlParams, carrier: wire[0]?.headers[CARRIER] })
-await run(headerToUrlParam)
-show("workaround", { url: wire[1]?.url, urlParams: wire[1]?.urlParams, carrier: wire[1]?.headers[CARRIER] ?? null })
-console.log("\nobserved: the per-call options take headers only; a URL param needs a carrier header plus HttpClient.mapRequest under layerHttp.")
-console.log("wanted:   a per-call (or middleware) way to set URL params on the request, e.g. { urlParams: { preview } }.")
+await Effect.gen(function*() {
+  const client = yield* GraphQLClient.make(SearchGraphQLGroup)
+  return yield* client.Search({ text: "x" }, { urlParams: { preview: "draft-42" } })
+}).pipe(Effect.provide(protocol(handler)), Effect.runPromise)
+const call = wire[0]
+show("per-call", { url: call?.url, urlParams: call?.urlParams, headers: Object.keys(call?.headers ?? {}) })
+
+await Effect.gen(function*() {
+  const client = yield* GraphQLClient.make(SearchGraphQLGroup.middleware(Preview))
+  return yield* client.Search({ text: "x" })
+}).pipe(Effect.provide(protocol(handler)), Effect.provide(previewLayer), Effect.runPromise)
+const mw = wire[1]
+show("middleware", { url: mw?.url, urlParams: mw?.urlParams })
+
+const fixed = new URLSearchParams(call?.urlParams).get("preview") === "draft-42" &&
+  new URLSearchParams(mw?.urlParams).get("preview") === "mw-7"
+console.log("\nobserved: { urlParams } per call and GraphQLRequest.urlParams in middleware both reach the URL; no carrier header, no HttpClient.mapRequest.")
+console.log("before:   (091d1a1) per-call options took headers only; a carrier header plus HttpClient.mapRequest was needed.")
+console.log("wanted:   a per-call (or middleware) way to set URL params on the request.")
+verdict(fixed)

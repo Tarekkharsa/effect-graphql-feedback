@@ -20,9 +20,9 @@
     "probes": "npm run probe:00 && npm run probe:01 && npm run probe:02 && npm run probe:03 && npm run probe:04 && npm run probe:05"
   },
   "dependencies": {
-    "@effect/graphql-generator": "https://pkg.pr.new/Effect-TS/effect/@effect/graphql-generator@091d1a1",
-    "@effect/platform-node": "https://pkg.pr.new/Effect-TS/effect/@effect/platform-node@091d1a1",
-    "effect": "https://pkg.pr.new/Effect-TS/effect/effect@091d1a1"
+    "@effect/graphql-generator": "https://pkg.pr.new/Effect-TS/effect/@effect/graphql-generator@7ee8dca",
+    "@effect/platform-node": "https://pkg.pr.new/Effect-TS/effect/@effect/platform-node@7ee8dca",
+    "effect": "https://pkg.pr.new/Effect-TS/effect/effect@7ee8dca"
   },
   "devDependencies": {
     "tsx": "^4.23.15",
