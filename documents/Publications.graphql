@@ -1,0 +1,15 @@
+query Publications($first: Int!, $after: String, $sort: SortOrder) {
+  publications(first: $first, after: $after, sort: $sort) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      cursor
+      node {
+        ...PublicationFields
+      }
+    }
+  }
+}

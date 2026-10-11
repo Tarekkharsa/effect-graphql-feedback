@@ -1,0 +1,94 @@
+"""An invented library content API used only to reproduce generator behavior."""
+scalar Isbn
+
+interface Node {
+  id: ID!
+}
+
+interface Publication {
+  id: ID!
+  title: String!
+  "Unix time in seconds."
+  publishedAt: Int!
+}
+
+type Author implements Node {
+  id: ID!
+  name: String!
+  bio: String
+}
+
+type Book implements Node & Publication {
+  id: ID!
+  title: String!
+  publishedAt: Int!
+  isbn: Isbn!
+  pageCount: Int
+  author: Author
+  series: Series
+}
+
+type Magazine implements Node & Publication {
+  id: ID!
+  title: String!
+  publishedAt: Int!
+  issueNumber: Int!
+}
+
+type Series implements Node {
+  id: ID!
+  name: String!
+  "Nullable parent with a non-null child."
+  cover: Image
+}
+
+type Image {
+  url: String!
+  alt: String
+}
+
+type Shelf implements Node {
+  id: ID!
+  name: String!
+}
+
+union SearchResult = Book | Magazine | Author
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+type PublicationEdge {
+  cursor: String!
+  node: Publication!
+}
+
+type PublicationConnection {
+  edges: [PublicationEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+enum SortOrder {
+  NEWEST
+  OLDEST
+  TITLE
+}
+
+input PublicationFilter {
+  authorId: ID
+  publishedAfter: Int
+}
+
+type Query {
+  node(id: ID!): Node
+  book(isbn: Isbn!): Book
+  publications(first: Int!, after: String, sort: SortOrder, filter: PublicationFilter): PublicationConnection!
+  search(text: String!): [SearchResult!]!
+  shelves: [Shelf!]!
+}
+
+type Mutation {
+  addToShelf(shelfId: ID!, bookId: ID!): Shelf
+}

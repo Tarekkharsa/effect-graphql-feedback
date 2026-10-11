@@ -1,0 +1,22 @@
+fragment PublicationFields on Publication {
+  id
+  title
+  publishedAt
+  ... on Book {
+    isbn
+    pageCount
+    author {
+      name
+    }
+    series {
+      name
+      cover {
+        url
+        alt
+      }
+    }
+  }
+  ... on Magazine {
+    issueNumber
+  }
+}

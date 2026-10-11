@@ -1,0 +1,32 @@
+{
+  "name": "effect-graphql-feedback",
+  "version": "0.0.0",
+  "private": false,
+  "license": "MIT",
+  "description": "Reproductions for feedback on Effect-TS/effect#8979 (effect/graphql)",
+  "type": "module",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "generate": "graphqlgen",
+    "check": "graphqlgen --check",
+    "typecheck:ts7": "node node_modules/typescript-7/bin/tsc -p tsconfig.json",
+    "typecheck:ts6": "node node_modules/typescript/bin/tsc6 -p tsconfig.json",
+    "probe:00": "npm run typecheck:ts7",
+    "probe:01": "tsx probes/01-response-error-status.ts",
+    "probe:02": "tsx probes/02-get-transport.ts",
+    "probe:03": "tsx probes/03-url-params.ts",
+    "probe:04": "tsx probes/04-batching-middleware.ts",
+    "probe:05": "tsx probes/05-test-layer.ts",
+    "probes": "npm run probe:00 && npm run probe:01 && npm run probe:02 && npm run probe:03 && npm run probe:04 && npm run probe:05"
+  },
+  "dependencies": {
+    "@effect/graphql-generator": "https://pkg.pr.new/Effect-TS/effect/@effect/graphql-generator@091d1a1",
+    "@effect/platform-node": "https://pkg.pr.new/Effect-TS/effect/@effect/platform-node@091d1a1",
+    "effect": "https://pkg.pr.new/Effect-TS/effect/effect@091d1a1"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "typescript-7": "npm:typescript@7.0.2"
+  }
+}

@@ -1,0 +1,6 @@
+mutation AddToShelf($shelfId: ID!, $bookId: ID!) {
+  addToShelf(shelfId: $shelfId, bookId: $bookId) {
+    id
+    name
+  }
+}

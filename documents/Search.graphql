@@ -1,0 +1,18 @@
+query Search($text: String!) {
+  search(text: $text) {
+    ... on Book {
+      id
+      title
+      isbn
+    }
+    ... on Magazine {
+      id
+      title
+      issueNumber
+    }
+    ... on Author {
+      id
+      name
+    }
+  }
+}
